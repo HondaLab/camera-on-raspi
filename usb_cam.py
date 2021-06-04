@@ -3,11 +3,13 @@ import cv2
 import os
 import time
 
+record_fps=28 # システムのスピードに応じて変更する必要あり
+camera_dev='/dev/video2'
+
 record_frame=input('# 録画しますか(y/n default=y)')
 if record_frame=='':
    record_frame='y'
 if record_frame=='y':
-   record_fps=28
    OUT_FILE='out.mp4'
    while os.path.exists(OUT_FILE):
       print("# %sはすでに存在しています．" % OUT_FILE)
@@ -17,7 +19,7 @@ if record_frame=='y':
 
 
 # open camera
-cap = cv2.VideoCapture('/dev/video2', cv2.CAP_V4L2)
+cap = cv2.VideoCapture(camera_dev, cv2.CAP_V4L2)
 if cap.isOpened(): # カメラが開けた場合
 
    # set dimensions
