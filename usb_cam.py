@@ -7,6 +7,7 @@ record_frame=input('# 録画しますか(y/n default=y)')
 if record_frame=='':
    record_frame='y'
 if record_frame=='y':
+   record_fps=28
    OUT_FILE='out.mp4'
    while os.path.exists(OUT_FILE):
       print("# %sはすでに存在しています．" % OUT_FILE)
@@ -16,7 +17,7 @@ if record_frame=='y':
 
 
 # open camera
-cap = cv2.VideoCapture('/dev/video0', cv2.CAP_V4L2)
+cap = cv2.VideoCapture('/dev/video2', cv2.CAP_V4L2)
 if cap.isOpened(): # カメラが開けた場合
 
    # set dimensions
@@ -35,7 +36,7 @@ if cap.isOpened(): # カメラが開けた場合
       width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
       height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
       size = (width, height)
-      vw = cv2.VideoWriter(OUT_FILE, fmt, frame_rate, size)
+      vw = cv2.VideoWriter(OUT_FILE, fmt, record_fps, size)
 
    count=0
    print("# Input 'q' to stop the camera.")
