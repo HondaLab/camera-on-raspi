@@ -1,8 +1,14 @@
 #!/usr/bin/python3
 import cv2
+import os
 import time
 
 record_frame='y'
+OUT_FILE='out.mp4'
+while os.path.exists(OUT_FILE):
+   print("# %sはすでに存在しています．" % OUT_FILE)
+   OUT_FILE=input('## 新しい出力ファイル名:')
+
 
 # open camera
 cap = cv2.VideoCapture('/dev/video0', cv2.CAP_V4L2)
@@ -24,7 +30,7 @@ if cap.isOpened():
       width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
       height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
       size = (width, height)
-      vw = cv2.VideoWriter('out.mp4', fmt, frame_rate, size)
+      vw = cv2.VideoWriter(OUT_FILE, fmt, frame_rate, size)
 
    count=0
    print("# Input 'q' to stop the camera.")
@@ -49,8 +55,9 @@ if cap.isOpened():
    print("rate=%5.2f (Hz)" % rate)
    print("speed=%5.2f (msec)" % speed)
 
-
-   vw.release()
+   if record_frame=='y':
+      print("%sに%7.2f(sec) 録画されました" % (OUT_FILE,now-start))
+      vw.release()
    # release camera
    cap.release()
 
