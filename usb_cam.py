@@ -8,6 +8,8 @@ OUT_FILE='out.mp4'
 while os.path.exists(OUT_FILE):
    print("# %sはすでに存在しています．" % OUT_FILE)
    OUT_FILE=input('## 新しい出力ファイル名:')
+   OUT_FILE=OUT_FILE+'.mp4'
+print('%s に動画を書き出します．' % OUT_FILE)
 
 
 # open camera
