@@ -3,18 +3,21 @@ import cv2
 import os
 import time
 
-record_frame='y'
-OUT_FILE='out.mp4'
-while os.path.exists(OUT_FILE):
-   print("# %sはすでに存在しています．" % OUT_FILE)
-   OUT_FILE=input('## 新しい出力ファイル名:')
-   OUT_FILE=OUT_FILE+'.mp4'
-print('%s に動画を書き出します．' % OUT_FILE)
+record_frame=input('# 録画しますか(y/n default=y)')
+if record_frame=='':
+   record_frame='y'
+if record_frame=='y':
+   OUT_FILE='out.mp4'
+   while os.path.exists(OUT_FILE):
+      print("# %sはすでに存在しています．" % OUT_FILE)
+      OUT_FILE=input('## 新しい出力ファイル名:')
+      OUT_FILE=OUT_FILE+'.mp4'
+   print('%s に動画を書き出します．' % OUT_FILE)
 
 
 # open camera
 cap = cv2.VideoCapture('/dev/video0', cv2.CAP_V4L2)
-if cap.isOpened():
+if cap.isOpened(): # カメラが開けた場合
 
    # set dimensions
    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
@@ -63,6 +66,6 @@ if cap.isOpened():
    # release camera
    cap.release()
 
-else:
+else: # カメラが開けなかった場合
    print("# Camera is NOT opened.")
    print("# Connect and turn on USB camera.")
