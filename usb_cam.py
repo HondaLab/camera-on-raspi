@@ -2,25 +2,24 @@
 import cv2
 import os
 import time
+import modules.keyin as keyin
 
-record_fps=28 # システムのスピードに応じて変更する必要あり
-camera_dev='/dev/video2'
-
-record_frame=input('# 録画しますか(y/n default=y)')
-if record_frame=='':
-   record_frame='y'
-if record_frame=='y':
-   OUT_FILE='out.mp4'
-   while os.path.exists(OUT_FILE):
-      print("# %sはすでに存在しています．" % OUT_FILE)
-      OUT_FILE=input('## 新しい出力ファイル名:')
-      OUT_FILE=OUT_FILE+'.mp4'
-   print('%s に動画を書き出します．' % OUT_FILE)
-
+record_fps=4 # システムのスピードに応じて変更する必要あり
+camera_dev='/dev/video0'
 
 # open camera
 cap = cv2.VideoCapture(camera_dev, cv2.CAP_V4L2)
 if cap.isOpened(): # カメラが開けた場合
+   record_frame=input('# 録画しますか(y/n default=y)')
+   if record_frame=='':
+      record_frame='y'
+   if record_frame=='y':
+      OUT_FILE='out.mp4'
+      while os.path.exists(OUT_FILE):
+         print("# %sはすでに存在しています．" % OUT_FILE)
+         OUT_FILE=input('## 新しい出力ファイル名:')
+         OUT_FILE=OUT_FILE+'.mp4'
+      print('%s に動画を書き出します．' % OUT_FILE)
 
    # set dimensions
    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
@@ -42,14 +41,18 @@ if cap.isOpened(): # カメラが開けた場合
 
    count=0
    print("# Input 'q' to stop the camera.")
-   key=cv2.waitKey(1)
    now=time.time()
    start=now
-   while key!=ord('q'):
+   key=keyin.Keyboard()
+   ch='c'  
+   while ch!='q':
+   #while now-start<10:
       # take frame
       ret, frame = cap.read()
+      #frame=cv2.rotate(frame,cv2.ROTATE_90_COUNTERCLOCKWISE)
       cv2.imshow('frame',frame)
-      key=cv2.waitKey(1)
+      cv2.waitKey(1)
+      ch=key.read()
       if record_frame=='y':
          vw.write(frame)
         
