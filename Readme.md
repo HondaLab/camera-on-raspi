@@ -1,6 +1,6 @@
 ラズパイに接続したPicamera や Debian PCにつないだUSBカメラから，OpenCVで画像処理する．
 
-### Depend 
+### Requirements
  * apt-get install python3-opencv
 
 ### usb_cam.py: USBカメラ用
