@@ -4,7 +4,10 @@ import os
 import time
 import modules.keyin as keyin
 
-record_fps=4 # システムのスピードに応じて変更する必要あり
+#(640x360),(1280x720),(1440x1440),... for SF360 4K
+WIDTH=640
+HEIGHT=360
+record_fps=18 # システムのスピードに応じて変更する必要あり
 camera_dev='/dev/video0'
 
 # open camera
@@ -22,8 +25,8 @@ if cap.isOpened(): # カメラが開けた場合
       print('%s に動画を書き出します．' % OUT_FILE)
 
    # set dimensions
-   cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
-   cap.set(cv2.CAP_PROP_FRAME_HEIGHT,720)
+   cap.set(cv2.CAP_PROP_FRAME_WIDTH, WIDTH)
+   cap.set(cv2.CAP_PROP_FRAME_HEIGHT,HEIGHT)
    #cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'))
    cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc('Y', 'U', 'Y', 'V'))
    cap.set(cv2.CAP_PROP_BUFFERSIZE, 4) # BUFFERSIZE を小さくするとレートが速くなる
@@ -45,13 +48,14 @@ if cap.isOpened(): # カメラが開けた場合
    start=now
    key=keyin.Keyboard()
    ch='c'  
-   while ch!='q':
+   ch_im=cv2.waitKey(1)
+   while not(ch=='q' or ch_im==ord('q') or ch=='Q' or ch_im==ord('Q')):
    #while now-start<10:
       # take frame
       ret, frame = cap.read()
       #frame=cv2.rotate(frame,cv2.ROTATE_90_COUNTERCLOCKWISE)
       cv2.imshow('frame',frame)
-      cv2.waitKey(1)
+      ch_im=cv2.waitKey(1)
       ch=key.read()
       if record_frame=='y':
          vw.write(frame)
