@@ -5,8 +5,8 @@ import time
 import modules.keyin as keyin
 
 #(640x360),(1280x720),(1440x1440),... for SF360 4K
-WIDTH=640
-HEIGHT=360
+WIDTH=1280
+HEIGHT=720
 record_fps=18 # システムのスピードに応じて変更する必要あり
 camera_dev='/dev/video0'
 
@@ -36,7 +36,6 @@ if cap.isOpened(): # カメラが開けた場合
       # 保存用
       fmt = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')
       #frame_rate = int(cap.get(cv2.CAP_PROP_FPS))
-      frame_rate = 4
       width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
       height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
       size = (width, height)
@@ -54,7 +53,7 @@ if cap.isOpened(): # カメラが開けた場合
       # take frame
       ret, frame = cap.read()
       #frame=cv2.rotate(frame,cv2.ROTATE_90_COUNTERCLOCKWISE)
-      cv2.imshow('frame',frame)
+      cv2.imshow('frame'+str(WIDTH)+'x'+str(HEIGHT),frame)
       ch_im=cv2.waitKey(1)
       ch=key.read()
       if record_frame=='y':
