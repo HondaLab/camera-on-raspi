@@ -9,6 +9,8 @@ import picamera.array
 # 解像度 (ex. 640x480, 320x240)
 WIDTH=320
 HEIGHT=320
+show_w=int(WIDTH*2.5)
+show_h=int(HEIGHT*2.5)
 
 # Picameraを初期化する
 cam = picamera.PiCamera()
@@ -38,18 +40,19 @@ rgb=picamera.array.PiRGBArray(cam, size=(WIDTH, HEIGHT))
 rgb.truncate(0) # clear the stream for next frame
 
 # camera capture loop
-key=cv2.waitKey(1) & 0xFF
+print("Input 'q' to stop")
+key=cv2.waitKey(1)
 while key!=ord('q'):
    # rgb.arrayに画像を取り込む
    cam.capture(rgb, format="bgr", use_video_port="True")
    frame = rgb.array
 
-   x=int(WIDTH/2); y=int(HEIGHT/2)
-   print("\r %5d" % frame[y,x,0],end='')
-
+   #x=int(WIDTH/2); y=int(HEIGHT/2)
+   #print("\r %5d" % frame[y,x,0],end='')
+   #mag=cv2.resize(frame,dsize=(show_w,show_h),interpolation=cv2.INTER_NEAREST)
    cv2.imshow('image',frame)
 
-   key=cv2.waitKey(1) & 0xFF
+   key=cv2.waitKey(1)
    rgb.truncate(0) # clear the stream for next frame
 
 cv2.destroyAllWindows()
