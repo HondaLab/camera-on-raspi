@@ -4,6 +4,7 @@ import os
 import time
 import modules.keyin as keyin
 import numpy as np
+import platform
 
 #(640x360),(1280x720),(1440x1440),... for SP360 4K
 WIDTH=1440
@@ -75,11 +76,21 @@ def check_camera_connection():
 if camera_check == "y":
     check_camera_connection()
 
-
+# pythonとopencvのバージョンを確認
+if show_version == "y":
+    py_ver = str(platform.python_version_tuple())
+    py_ver = py_ver.replace("'",'')
+    py_ver = py_ver.replace(",",'.')
+    py_ver = py_ver.replace("(",'')
+    py_ver = py_ver.replace(")",'')
+    py_ver = py_ver.replace(" ",'')
+    print("Python3のバージョン： ",end="")
+    print(py_ver)
+    print("opencvのバージョン： ",end="")
+    print(cv2.__version__)
 
 # open camera
-#cap = cv2.VideoCapture(camera_dev, cv2.CAP_V4L2)
-cap = cv2.VideoCapture(2)
+cap = cv2.VideoCapture(camera_dev, cv2.CAP_V4L2)
 if cap.isOpened(): # カメラが開けた場合
    save_video=input('# 録画しますか(y/n default=y)')
    if save_video=='':
@@ -97,7 +108,7 @@ if cap.isOpened(): # カメラが開けた場合
    cap.set(cv2.CAP_PROP_FRAME_HEIGHT,HEIGHT)
    #cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'))
    cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc('Y', 'U', 'Y', 'V'))
-   #cap.set(cv2.CAP_PROP_BUFFERSIZE, 10) # BUFFERSIZE を小さくするとレートが速くなる
+   cap.set(cv2.CAP_PROP_BUFFERSIZE, 10) # BUFFERSIZE を小さくするとレートが速くなる
    cap.set(cv2.CAP_PROP_FPS, 30)
 
    if save_video=='y':
@@ -107,7 +118,8 @@ if cap.isOpened(): # カメラが開けた場合
       WIDTH = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
       HEIGHT = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
       size = (WIDTH, HEIGHT)
-      vw = cv2.VideoWriter(OUT_FILE, fmt, record_fps, size)
+      #vw = cv2.VideoWriter(OUT_FILE, fmt, record_fps, size)
+      vw = cv2.VideoWriter(OUT_FILE, fmt, record_fps, (720,720))
 
    count=0
    print("# Input 'q' to stop the camera.")
@@ -118,6 +130,7 @@ if cap.isOpened(): # カメラが開けた場合
    ch_im=cv2.waitKey(1)
    while not(ch=='q' or ch_im==ord('q') or ch=='Q' or ch_im==ord('Q')):
       ret, frame = cap.read()
+      #print(type(frame))
 
       if camera_mirror == "y":
          frame = frame[:,::-1]
@@ -150,7 +163,8 @@ if cap.isOpened(): # カメラが開けた場合
          #frame = cv2.resize(frame, disp_size)
 
 
-
+      print("トリミング後のsize",frame.shape)
+      #print(type(frame))
       if imshow == "y":
          cv2.imshow("camera", frame)
          if cv2.waitKey(1) & 0xFF == ord('q'):
