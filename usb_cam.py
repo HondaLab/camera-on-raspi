@@ -163,7 +163,7 @@ if cap.isOpened(): # カメラが開けた場合
          #frame = cv2.resize(frame, disp_size)
 
 
-      print("トリミング後のsize",frame.shape)
+      #print("トリミング後のsize",frame.shape)
       #print(type(frame))
       if imshow == "y":
          cv2.imshow("camera", frame)
