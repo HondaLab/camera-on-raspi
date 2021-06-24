@@ -5,11 +5,12 @@ import time
 import modules.keyin as keyin
 import numpy as np
 
-#(640x360),(1280x720),(1440x1440),... for SF360 4K
+#(640x360),(1280x720),(1440x1440),... for SP360 4K
 WIDTH=1440
 HEIGHT=1440
 size = (WIDTH , HEIGHT)
-record_fps=18 # システムのスピードに応じて変更する必要あり
+disp_size = (720,720)
+record_fps=10 # システムのスピードに応じて変更する必要あり
 camera_dev='/dev/video2'
 
 camera_mirror = "n"       # 反転して映る際はyesに変更      
@@ -77,7 +78,8 @@ if camera_check == "y":
 
 
 # open camera
-cap = cv2.VideoCapture(camera_dev, cv2.CAP_V4L2)
+#cap = cv2.VideoCapture(camera_dev, cv2.CAP_V4L2)
+cap = cv2.VideoCapture(2)
 if cap.isOpened(): # カメラが開けた場合
    save_video=input('# 録画しますか(y/n default=y)')
    if save_video=='':
@@ -95,7 +97,7 @@ if cap.isOpened(): # カメラが開けた場合
    cap.set(cv2.CAP_PROP_FRAME_HEIGHT,HEIGHT)
    #cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'))
    cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc('Y', 'U', 'Y', 'V'))
-   cap.set(cv2.CAP_PROP_BUFFERSIZE, 4) # BUFFERSIZE を小さくするとレートが速くなる
+   #cap.set(cv2.CAP_PROP_BUFFERSIZE, 10) # BUFFERSIZE を小さくするとレートが速くなる
    cap.set(cv2.CAP_PROP_FPS, 30)
 
    if save_video=='y':
@@ -116,6 +118,7 @@ if cap.isOpened(): # カメラが開けた場合
    ch_im=cv2.waitKey(1)
    while not(ch=='q' or ch_im==ord('q') or ch=='Q' or ch_im==ord('Q')):
       ret, frame = cap.read()
+
       if camera_mirror == "y":
          frame = frame[:,::-1]
 
@@ -126,8 +129,6 @@ if cap.isOpened(): # カメラが開けた場合
          picname = cap_time+".png"
          cv2.imwrite(picname, frame)
 
-      if save_video == "y":
-         video.write(frame)
 
       if rotation == "y":
            #回転させる処理
@@ -135,13 +136,20 @@ if cap.isOpened(): # カメラが開けた場合
          rotation_matrix = cv2.getRotationMatrix2D(center2, ANGLE, SCALE)
          frame = cv2.warpAffine(frame, rotation_matrix, size, flags=cv2.INTER_CUBIC)
          #frame = cv2.resize(frame, disp_size)
+
       if triming == "y":
          frame = frame[triming_start_x:triming_start_x + triming_range , triming_start_y:triming_start_y + triming_range]
-         #frame = cv2.resize(frame, disp_size)
+         frame = cv2.resize(frame, disp_size)
+
+      if save_video == "y":
+         vw.write(frame)
+
       if calibration == "y":
            #キャプチャ画像のセンターを表示する処理
          frame = frame[calib_start_x:calib_start_x + calib_range , calib_start_y:calib_start_y + calib_range]
          #frame = cv2.resize(frame, disp_size)
+
+
 
       if imshow == "y":
          cv2.imshow("camera", frame)
