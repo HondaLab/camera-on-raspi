@@ -82,7 +82,7 @@ if save_video=='y':
      # 動画保存用設定
     cap_now = dt.datetime.now()
     fourcc = cv2.VideoWriter_fourcc('m', 'p', '4', 'v') # 動画保存時のfourcc設定（mp4用）
-    video = cv2.VideoWriter(filename, fourcc, fps, (width, hight))  
+    video = cv2.VideoWriter(filename, fourcc, fps, (720, 720))  
     # 動画の仕様（ファイル名、fourcc, FPS, サイズ)
 
 
