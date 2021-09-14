@@ -1,58 +1,91 @@
-#!/usr/bin/python3
-# Only read image from picamera (Yasushiu Honda 2021 6/20)
+#! /usr/bin/python3
+# Yasushiu Honda 2021 9/8
+# Capture frames from PiCamera and record them to /tmp 
 
 import cv2
 import time
-import picamera
-import picamera.array
+from picamera.array import PiRGBArray
+from picamera import PiCamera
+import modules.keyin as keyin
 
-# 解像度 (ex. 640x480, 320x240)
-WIDTH=320
-HEIGHT=320
-show_w=int(WIDTH*2.5)
-show_h=int(HEIGHT*2.5)
+class PI_CAMERA():
+   def __init__(self,width,height):
+      
+      # カメラの解像度 例：640x480, 320x240
+      self.RES_X=int( width )
+      self.RES_Y=int( height )
+      
+      # initialize the camera and grab a reference to the raw camera capture
+      #カメラを初期化，カメラへのアクセス？ルート？オブジェクト作成？
+      self.cam = PiCamera()
+      self.cam.framerate = 30  #フレームレート
+      self.cam.brightness = 60 #明るさ
+      #cam.saturation = 50
 
-# Picameraを初期化する
-cam = picamera.PiCamera()
-cam.framerate = 30
-#cam.brightness = 50
-#cam.saturation = 50
+      self.cam.awb_mode='auto'
+      #list_awb = ['off', 'auto', 'sunlight', 'cloudy', 'shade']
+      self.cam.iso=400
+      self.cam.shutter_speed=1000000
+      self.cam.exposure_mode = 'auto' # off, auto, fixedfps
+      time.sleep(1)
+      self.g = self.cam.awb_gains
+      self.cam.awb_mode = 'off'
+      self.cam.awb_gains = self.g
 
-# いったんホワイトバランスをオートにする
-cam.awb_mode='auto'
-time.sleep(1)
-# 途中で色味が変化しないようにホワイトバランスを固定する
-g = cam.awb_gains
-cam.awb_mode = 'off'
-cam.awb_gains = g
+      self.cam.resolution = (self.RES_X, self.RES_Y)
+      self.cam.rotation=0
+      self.cam.meter_mode = 'average' # average, spot, backlit, matrix
+      self.cam.exposure_compensation = 0
+      self.rawCapture = PiRGBArray(self.cam, size=(self.RES_X, self.RES_Y))
 
-cam.iso=800
-cam.shutter_speed=1000000
-cam.exposure_mode = 'off' # off, auto, fixedfps
+      self.rawCapture.truncate(0) # clear the stream for next frame
 
-cam.resolution = (WIDTH, HEIGHT)
-cam.rotation=0
-cam.meter_mode = 'average' # average, spot, backlit, matrix
-cam.exposure_compensation = 0
+   def capture(self):
+      tmp = self.cam.capture_continuous(self.rawCapture, format="bgr", use_video_port="True")
+      cap = next(tmp)
+      frame = cap.array
 
-# キャプチャー用のRGB配列を用意する
-rgb=picamera.array.PiRGBArray(cam, size=(WIDTH, HEIGHT))
-rgb.truncate(0) # clear the stream for next frame
+      self.rawCapture.truncate(0) # clear the stream for next frame
 
-# camera capture loop
-print("Input 'q' to stop")
-key=cv2.waitKey(1)
-while key!=ord('q'):
-   # rgb.arrayに画像を取り込む
-   cam.capture(rgb, format="bgr", use_video_port="True")
-   frame = rgb.array
+      return frame
 
-   #x=int(WIDTH/2); y=int(HEIGHT/2)
-   #print("\r %5d" % frame[y,x,0],end='')
-   #mag=cv2.resize(frame,dsize=(show_w,show_h),interpolation=cv2.INTER_NEAREST)
-   cv2.imshow('image',frame)
 
-   key=cv2.waitKey(1)
-   rgb.truncate(0) # clear the stream for next frame
+if __name__ == "__main__":
+    # For recording
+    OUT_FILE="/tmp/output.mp4"
+    print("# Captured movie is written in %s ." % OUT_FILE)
+    fmt = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')
+    record_fps=9
+    width=720
+    height=480
+    print("# Resolution: %5d x %5d" % (width,height))
+    size = (width, height)
+    vw = cv2.VideoWriter(OUT_FILE, fmt, record_fps, size)
 
-cv2.destroyAllWindows()
+    cam = PI_CAMERA(width,height)
+
+    key=keyin.Keyboard()
+    ch='c'
+
+    now=time.time()
+    start=now
+    print("# To stop, input 'q' in this terminal.")
+    while ch!='q':
+        now=time.time()
+        print("\r time: %8.2f" % (now-start), end='')
+        ch=key.read()
+        try: 
+            frame = cam.capture()
+            cv2.imshow("Front View", frame)
+            cv2.waitKey(1)
+
+            vw.write(frame)
+
+        except KeyboardInterrupt:
+            print("ctrl + C ")
+            cv2.destroyAllWindows()
+            vw.release()
+
+    cv2.destroyAllWindows()
+    vw.release()
+    print("\n # Bye-bye \n")
